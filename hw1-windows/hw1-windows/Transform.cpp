@@ -25,7 +25,8 @@ mat3 Transform::rotate(const float degrees, const vec3& axis) {
 	// Comsci masters student showed me the ways of outer product <3
 
 	glm::mat3 myIdentityMatrix = glm::mat3(1.0f);
-	glm::mat3 myCustomMatrix1 = glm::outerProduct(axis, axis);
+	glm::vec3 normalizedAxis = glm::normalize(axis);
+	glm::mat3 myCustomMatrix1 = glm::outerProduct(normalizedAxis, axis);
 
 	glm::mat3 myCustomMatrix2 = glm::mat3(0, axis.z, -axis.y, -axis.z, 0, axis.x, axis.y, -axis.x, 0);
 	
@@ -92,8 +93,6 @@ void Transform::left(float degrees, vec3& eye, vec3& up) {
   // YOUR CODE FOR HW1 HERE
 	mat3 matrix3;
 	matrix3 = rotate(degrees, up);
-	cout << "Rotated matrix)" << endl;
-	displayMatrix3(matrix3);
 
 	//quick and dir'y
 	float radians = degrees * pi / 180;
@@ -111,16 +110,20 @@ void Transform::up(float degrees, vec3& eye, vec3& up) {
   // YOUR CODE FOR HW1 HERE 
 // we need to rotate along an axis that is 90* to the look and 
 
+
 	vec3 axisOfRotation = glm::cross(eye, up);
 	vec3 v = eye;
 	vec3 v2 = up;
 	vec3 k = axisOfRotation;
+	k = glm::normalize(k);
 	float radians = degrees * pi / 180;
-
+	if (glm::length(axisOfRotation) < 1e-6f) {
+		// Handle the case where 'eye' and 'up' are nearly collinear
+		return;
+	}
 	v = v * glm::cos(radians) + (glm::cross(k, v)) * glm::sin(radians) + k * (glm::dot(k, v)) * (1 - glm::cos(radians));
-	v2 = v2 * glm::cos(radians) + (glm::cross(k, v2)) * glm::sin(radians) + k * (glm::dot(k, v2)) * (1 - glm::cos(radians));
 	eye = v;
-	up = v2;
+
 }
 
 
